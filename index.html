@@ -22,11 +22,70 @@
             box-sizing: border-box;
         }
 
+        #lastfm-cover-container {
+            position: relative;
+            display: inline-block;
+        }
+
         #lastfm-cover {
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             max-width: 100%;
             height: auto;
+            transition: filter 0.3s;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #lastfm-cover-container:hover #lastfm-cover {
+            filter: brightness(50%);
+        }
+
+        .overlay-buttons {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        #lastfm-cover-container:hover .overlay-buttons {
+            display: flex;
+        }
+
+        .overlay-button {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .overlay-button#lastfm-logo {
+            background-color: rgba(247, 20, 20);
+        }
+
+        .overlay-button#genius-logo {
+            background-color: #f7f714;
+
+        }
+
+        .overlay-button:hover {
+            transform: scale(1.1);
+        }
+
+        .overlay-button img {
+            width: 20px;
+            height: 20px;
         }
 
         #lastfm-song {
@@ -88,12 +147,20 @@
 
 <body>
     <div id="lastfm-widget">
-        <!-- <span id="lastfm-scrobbling-date"></span> -->
-        <img id="lastfm-cover" src="" alt="Cover Art" style="width: 150px; height: auto;">
+        <div id="lastfm-cover-container">
+            <img id="lastfm-cover" class="hidden" src="" alt="Cover Art" style="width: 150px; height: auto;">
+            <div class="overlay-buttons">
+                <a href="https://www.last.fm" target="_blank" class="overlay-button" id="lastfm-logo" title="LastFM">
+                    <img src="assets/lastfm_logo.svg" alt="LastFM">
+                </a>
+                <a href="https://genius.com" target="_blank" class="overlay-button" id="genius-logo" title="Genius">
+                    <img src="assets/genius_logo.svg" alt="Genius">
+                </a>
+            </div>
+        </div>
         <span id="lastfm-song">Cargando última canción...</span>
         <span id="lastfm-artist"></span>
     </div>
-
 
     <script>
         function GetURLParameter(sParam) {
@@ -106,8 +173,8 @@
                 }
             }
         }
-        const apiKey = GetURLParameter('api_key'); //'c11e6d873aa482319c0e470bae783311';
-        const username = GetURLParameter('username'); //'Monzon_Pablo';
+        const apiKey = GetURLParameter('api_key');
+        const username = GetURLParameter('username');
         const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`;
 
         if (!apiKey || !username) {
@@ -120,31 +187,15 @@
                         const track = data.recenttracks.track[0];
                         const songName = track.name;
                         const artistName = track.artist['#text'];
-                        const coverArt = track.image[2]['#text']; // Medium size image
-                        // const albumName = track.album['#text'];
-                        // const isNowPlaying = track['@attr'] && track['@attr'].nowplaying ? 'Escuchando ahora' : '';
-                        // if (isNowPlaying) {
-                        //     document.getElementById('lastfm-scrobbling-date').classList.add('now-playing');
-                        //     document.getElementById('lastfm-scrobbling-date').textContent = `${isNowPlaying}`;
-                        //     // Add class
-                        // } else {
-                        //     const timeScrobbled = track.date ? new Date(track.date['#text']) : new Date();
-                        //     const formattedTime = timeScrobbled.toLocaleString('es-ES', {
-                        //         year: 'numeric',
-                        //         month: '2-digit',
-                        //         day: '2-digit',
-                        //         hour: '2-digit',
-                        //         minute: '2-digit',
-                        //         second: '2-digit'
-                        //     });
-                        //     document.getElementById('lastfm-scrobbling-date').classList.remove('now-playing');
-                        //     document.getElementById('lastfm-scrobbling-date').classList.add('last-scrobbled');
-                        //     document.getElementById('lastfm-scrobbling-date').textContent = `Escuchado el ${formattedTime}`;
-                        // }
-                        // document.getElementById('lastfm-time-scrobbled').textContent = `${formattedTime}`;
+                        const coverArt = track.image[2]['#text'];
+                        const trackUrl = track.url; // URL of the track on LastFM
+                        const geniusSearchUrl = `https://genius.com/search?q=${encodeURIComponent(songName + ' ' + artistName)}`;
                         document.getElementById('lastfm-song').textContent = `${songName}`;
                         document.getElementById('lastfm-artist').textContent = `${artistName}`;
+                        document.getElementById('lastfm-cover').classList.remove('hidden'); // Show the cover art
                         document.getElementById('lastfm-cover').src = coverArt || 'default-image.jpg';
+                        document.getElementById('lastfm-logo').href = trackUrl; // Set the LastFM logo link to the track URL
+                        document.getElementById('genius-logo').href = geniusSearchUrl; // Set the Genius logo link to the search URL
                     })
                     .catch(error => {
                         console.error('Error fetching LastFM data:', error);
@@ -153,8 +204,7 @@
             }
 
             fetchLastFMData();
-            setInterval(fetchLastFMData, 30000); // Reiterar cada 30 segundos
-
+            setInterval(fetchLastFMData, 30000);
         }
     </script>
 </body>
