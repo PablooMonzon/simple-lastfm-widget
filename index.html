@@ -71,16 +71,18 @@
         }
 
         .overlay-button#lastfm-logo {
+            border: 2px solid #000;
             background-color: rgba(247, 20, 20);
         }
 
         .overlay-button#genius-logo {
-            background-color: #f7f714;
+            background-color: rgb(255, 255, 100);
 
         }
 
         .overlay-button:hover {
             transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .overlay-button img {
@@ -151,10 +153,10 @@
             <img id="lastfm-cover" class="hidden" src="" alt="Cover Art" style="width: 150px; height: auto;">
             <div class="overlay-buttons">
                 <a href="https://www.last.fm" target="_blank" class="overlay-button" id="lastfm-logo" title="LastFM">
-                    <img src="lastfm_logo.svg" alt="LastFM">
+                    <img src="assets/lastfm_logo.svg" alt="LastFM">
                 </a>
                 <a href="https://genius.com" target="_blank" class="overlay-button" id="genius-logo" title="Genius">
-                    <img src="genius_logo.svg" alt="Genius">
+                    <img src="assets/genius_logo.svg" alt="Genius">
                 </a>
             </div>
         </div>
